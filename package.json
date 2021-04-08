@@ -1,0 +1,24 @@
+{
+  "name": "forcelock",
+  "version": "1.0.0",
+  "description": "this is password manager",
+  "main": "forceLock.js",
+  "scripts": {
+    "test": "node forceLock.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cwkni605/crypto-encryption-program.git"
+  },
+  "author": "Knight",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cwkni605/crypto-encryption-program/issues"
+  },
+  "homepage": "https://github.com/cwkni605/crypto-encryption-program#readme",
+  "dependencies": {
+    "crypto-js": "^4.0.0",
+    "express": "^4.17.1",
+    "nexe": "^4.0.0-beta.18"
+  }
+}
