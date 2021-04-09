@@ -12,7 +12,8 @@ app.get(/[\s\S]*/, function(req, res) {
   let router = req.url;
   if(router == "/favicon.ico") router = "/";
 
-  if(router.startsWith("/password")) {
+  if(router.startsWith("/password"))
+  {
     fs.readFile("passwords.html", "utf-8",(err, siteData)=>
     {
       if(err) throw err;
@@ -35,6 +36,10 @@ app.get(/[\s\S]*/, function(req, res) {
       });
     });
   }
+  else if(router.startsWith("/new"))
+  {
+    //
+  }
   else
   {
     fs.readFile("login.html", "utf-8",(err, data)=>{
@@ -47,7 +52,6 @@ app.get(/[\s\S]*/, function(req, res) {
 function encrypt(text, passkey)
 {
   return encrypted = CryptoJS.AES.encrypt(text, passkey);
-
 }
 
 function decrypt(encryptedText, passkey)
