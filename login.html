@@ -3,7 +3,7 @@
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-            <title>File Manager</title>
+            <title>ForceLock</title>
             <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
             <style>
                 .my-4
@@ -48,6 +48,8 @@
                                             <input type="text" name="username" id="username" onkeyup="updateLink()">
                                             <p class="card-text">Passkey</p>
                                             <input type="text" name="passkey" id="passkey" onkeyup="updateLink()">
+                                            <p class="card-text">Rolling Key</p>
+                                            <input type="text" name="rollkey" id="rollkey" onkeyup="updateLink()">
                                             <br>
                                             <br>
                                             <a id="loginButton" href="password/USERNAME/PASSKEY" class="list-group-item">Login</a>
@@ -55,10 +57,12 @@
                                                 function updateLink() {
                                                     let name = document.getElementById("username").value;
                                                     let key = document.getElementById("passkey").value;
+                                                    let roll = document.getElementById("rollkey").value;
                                                     let link = document.getElementById("loginButton").href;
-                                                    link = link.slice(0,link.indexOf("password")) + "password/";
-                                                    link = link.slice(0, link.lastIndexOf("/")+1) + name + "/";
-                                                    link = link.slice(0, link.lastIndexOf("/")+1) + key;
+                                                    link = "password/";
+                                                    link = link + name + "/";
+                                                    link = link + key + "/";
+                                                    link = link + roll + "/";
                                                     document.getElementById("loginButton").href = link;
                                                 }
                                             </script>

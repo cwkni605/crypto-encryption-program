@@ -17,28 +17,96 @@ app.get(/[\s\S]*/, function(req, res) {
     fs.readFile("passwords.html", "utf-8",(err, siteData)=>
     {
       if(err) throw err;
-      let userName = router.slice(router.indexOf("/"),router.lastIndexOf("/"));
-      userName = userName.slice(userName.lastIndexOf("/")+1);
-      let userKey = router.slice(router.lastIndexOf("/")+1);
+      let slashpos;
+      slashpos = [];
+      for(let i = 0; i < router.length; i++)
+      {
+        if (router[i] === "/" && i != 0)
+        {
+          slashpos.push(i);
+        }
+      }
+      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let userKey = router.slice(slashpos[1]+1,slashpos[2]);
+      let rollingKey = router.slice(slashpos[2]+1);
+      console.log(userName);
+      console.log(userKey);
+      console.log(rollingKey);
       let output = [];
-      fs.readFile(userName + ".txt",(err, fileData)=>
+      fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
       {
         if(err) throw err;
         fileData = fileData.toString();
-        fileData = JSON.parse(decrypt(fileData, userKey).toString(CryptoJS.enc.Utf8));
+        if(rollingKey == "")
+        {
+          fileData = JSON.parse(decrypt(fileData, userKey));
+        }
+        else
+        {
+          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+        }
         for (let I = 0; I < fileData.length; I++)
         {
           const dataTrio = fileData[I];
           output.push(`<tr><td>${dataTrio.site}</td><td>${dataTrio.username}</td><td>${dataTrio.password}</td></tr>`);
         }
-        siteData = siteData.replace("^^_u_^^", output.toString());
+        siteData = siteData.replace("^^_u_^^", output.join(''));
         res.send(siteData);
       });
     });
   }
   else if(router.startsWith("/new"))
   {
-    //
+    fs.readFile("passwords.html", "utf-8",(err, siteData)=>
+    {
+      if(err) throw err;
+      let slashpos;
+      slashpos = [];
+      for(let i = 0; i < router.length; i++)
+      {
+        if (router[i] === "/" && i != 0)
+        {
+          slashpos.push(i);
+        }
+      }
+      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let userKey = router.slice(slashpos[1]+1,slashpos[2]);
+      let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
+      let newSite = router.slice(slashpos[3]+1,slashpos[4]);
+      let newUsername = router.slice(slashpos[4]+1,slashpos[5]);
+      let newPassword = router.slice(slashpos[5]+1,slashpos[6]);
+      console.log(userName);
+      console.log(userKey);
+      console.log(rollingKey);
+      console.log(newSite);
+      console.log(newUsername);
+      console.log(newPassword);
+      let output = [];
+      fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
+      {
+        if(err) throw err;
+        fileData = fileData.toString();
+        if(rollingKey == "")
+        {
+          fileData = JSON.parse(decrypt(fileData, userKey));
+        }
+        else
+        {
+          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+          tempIn = {"site":newSite,"username":newUsername,"password":newPassword};
+          let newFileData = fileData.push(tempIn);
+          newFileData = encryptMax(fileData,"logger");
+          fs.writeFileSync("testing.txt",newFileData.data);
+        }
+        for (let I = 0; I < fileData.length; I++)
+        {
+          const dataTrio = fileData[I];
+          output.push(`<tr><td>${dataTrio.site}</td><td>${dataTrio.username}</td><td>${dataTrio.password}</td></tr>`);
+        }
+        siteData = siteData.replace("^^_u_^^", output.join(''));
+        res.send(siteData);
+      });
+    });
   }
   else
   {
@@ -54,28 +122,102 @@ function encrypt(text, passkey)
   return encrypted = CryptoJS.AES.encrypt(text, passkey);
 }
 
+function encryptMax(text, passkey)
+{
+  let path = "";
+  let encrypted = text;
+  for (let i = 0; i < 10; i++)
+  {
+    let rand = Math.round(Math.random()*2);
+    path.concat(rand);
+    if (rand == 0) {
+      encrypted = String(CryptoJS.AES.encrypt(encrypted, passkey));
+    }
+    if (rand == 1) {
+      encrypted = String(CryptoJS.DES.encrypt(encrypted, passkey));
+    }
+    if (rand == 2) {
+      encrypted = String(CryptoJS.TripleDES.encrypt(encrypted, passkey));
+    }
+    if (rand == 3) {
+      encrypted = String(CryptoJS.RC4.encrypt(encrypted, passkey));
+    }
+    if (rand == 4) {
+      encrypted = String(CryptoJS.Rabbit.encrypt(encrypted, passkey));
+    }
+  }
+  //encrypted = CryptoJS.AES.encrypt(encrypted, passkey);
+  output = {"data":encrypted,"path":path};
+  output.data = encrypted;
+  return output;
+}
+
 function decrypt(encryptedText, passkey)
 {
-  return decrypted = CryptoJS.AES.decrypt(encryptedText, passkey);
+  return decrypted = CryptoJS.AES.decrypt(encryptedText, passkey).toString(CryptoJS.enc.Utf8);
+}
+
+function decryptMax(encryptedText, passkey, path)
+{
+  let decrypted = String(encryptedText);
+  for (let i = 0; i < path.length; i++)
+  {
+    let currentPath = path[path.length-1-i];
+    if (currentPath == 0) {
+      decrypted = CryptoJS.AES.decrypt(decrypted, passkey).toString(CryptoJS.enc.Utf8);
+    }
+    if (currentPath == 1) {
+      decrypted = CryptoJS.DES.decrypt(decrypted, passkey).toString(CryptoJS.enc.Utf8);
+    }
+    if (currentPath == 2) {
+      decrypted = CryptoJS.TripleDES.decrypt(decrypted, passkey).toString(CryptoJS.enc.Utf8);
+    }
+    if (currentPath == 3) {
+      decrypted = CryptoJS.RC4.decrypt(decrypted, passkey).toString(CryptoJS.enc.Utf8);
+    }
+    if (currentPath == 4) {
+      decrypted = CryptoJS.Rabbit.decrypt(decrypted, passkey).toString(CryptoJS.enc.Utf8);
+    }
+  }
+  
+  return decrypted.toString(CryptoJS.enc.Utf8);
 }
 
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
 /*
-fs.readFile("cknight167.json",(err, fileData)=>
+fs.readFile("cknight167.txt",(err, fileData)=>
 {
   //fileData = JSON.parse(fileData);
   fileData = fileData.toString();
   console.log(fileData);
   fileData = String(encrypt(fileData,"logger"));
-  fs.writeFileSync("cknight167.json",fileData);
+  fs.writeFileSync("cknight167.txt",fileData);
 });
 
 fs.readFile("cknight167.txt",(err, fileData)=>
 {
   fileData = fileData.toString();
-  fileData = decrypt(fileData,"logger").toString(CryptoJS.enc.Utf8);
+  fileData = decrypt(fileData,"logger");
   console.log(JSON.parse(fileData));
 });
 */
+
+
+//rolling key test (functional)
+/*
+fs.readFile("testing.txt",(err, fileData)=>
+{
+  fileData = fileData.toString();
+  fileData = encryptMax(fileData,"logger");
+  fs.writeFileSync("testing.txt",fileData.data);
+});
+//*/
+/*
+fs.readFile("testing.txt",(err, fileData)=>
+{
+  fileData = decryptMax(fileData, "logger", "2121133014");
+  console.log(JSON.parse(fileData));
+});
+//*/
