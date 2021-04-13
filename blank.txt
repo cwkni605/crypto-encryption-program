@@ -1,0 +1,17 @@
+[
+    {
+        "site":"a",
+        "username":"b",
+        "password":"c"
+    },
+    {
+        "site":"b",
+        "username":"c",
+        "password":"d"
+    },
+    {
+        "site":"c",
+        "username":"d",
+        "password":"e"
+    }
+]

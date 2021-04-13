@@ -117,19 +117,15 @@ app.get(/[\s\S]*/, function(req, res) {
   }
 });
 
-function encrypt(text, passkey)
-{
-  return encrypted = CryptoJS.AES.encrypt(text, passkey);
-}
-
 function encryptMax(text, passkey)
 {
   let path = "";
   let encrypted = text;
   for (let i = 0; i < 10; i++)
   {
-    let rand = Math.round(Math.random()*2);
-    path.concat(rand);
+    let rand = Math.round(Math.random()*4);
+    path = path.concat(rand);
+    console.log(path);
     if (rand == 0) {
       encrypted = String(CryptoJS.AES.encrypt(encrypted, passkey));
     }
@@ -146,15 +142,8 @@ function encryptMax(text, passkey)
       encrypted = String(CryptoJS.Rabbit.encrypt(encrypted, passkey));
     }
   }
-  //encrypted = CryptoJS.AES.encrypt(encrypted, passkey);
   output = {"data":encrypted,"path":path};
-  output.data = encrypted;
   return output;
-}
-
-function decrypt(encryptedText, passkey)
-{
-  return decrypted = CryptoJS.AES.decrypt(encryptedText, passkey).toString(CryptoJS.enc.Utf8);
 }
 
 function decryptMax(encryptedText, passkey, path)
@@ -179,10 +168,18 @@ function decryptMax(encryptedText, passkey, path)
       decrypted = CryptoJS.Rabbit.decrypt(decrypted, passkey).toString(CryptoJS.enc.Utf8);
     }
   }
-  
   return decrypted.toString(CryptoJS.enc.Utf8);
 }
 
+function decrypt(encryptedText, passkey)
+{
+  return decrypted = CryptoJS.AES.decrypt(encryptedText, passkey).toString(CryptoJS.enc.Utf8);
+}
+
+function encrypt(text, passkey)
+{
+  return encrypted = CryptoJS.AES.encrypt(text, passkey);
+}
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
@@ -212,12 +209,14 @@ fs.readFile("testing.txt",(err, fileData)=>
   fileData = fileData.toString();
   fileData = encryptMax(fileData,"logger");
   fs.writeFileSync("testing.txt",fileData.data);
+  //console.log(fileData.path);
 });
 //*/
-/*
+
 fs.readFile("testing.txt",(err, fileData)=>
 {
-  fileData = decryptMax(fileData, "logger", "2121133014");
+  if(err) throw err
+  fileData = decryptMax(fileData, "logger", "0110432121");
   console.log(JSON.parse(fileData));
 });
 //*/
