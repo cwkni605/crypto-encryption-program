@@ -36,15 +36,23 @@ app.get(/[\s\S]*/, function(req, res) {
       fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
       {
         if(err) throw err;
-        fileData = fileData.toString();
-        fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
-        for (let I = 0; I < fileData.length; I++)
-        {
-          const dataTrio = fileData[I];
-          output.push(`<tr><td>${dataTrio.site}</td><td>${dataTrio.username}</td><td>${dataTrio.password}</td></tr>`);
+        try {
+          fileData = fileData.toString();
+          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+          for (let I = 0; I < fileData.length; I++)
+          {
+            const dataTrio = fileData[I];
+            output.push(`<tr><td>${dataTrio.site}</td><td>${dataTrio.username}</td><td>${dataTrio.password}</td></tr>`);
+          }
+          if(fileData.length == 0)
+          {
+            output.push(`<tr><td>You Have no</td><td>Usernames</td><td>Or passwords</td></tr>`);
+          }
+          siteData = siteData.replace("^^_u_^^", output.join(''));
+          res.send(siteData);
+        } catch (error) {
+          res.redirect(`http://127.0.0.3:8000/`);
         }
-        siteData = siteData.replace("^^_u_^^", output.join(''));
-        res.send(siteData);
       });
     });
   }
@@ -78,11 +86,52 @@ app.get(/[\s\S]*/, function(req, res) {
       fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
       {
         if(err) throw err;
-        fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
-        fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
-        let encryptData = encryptMax(fileData,userKey);
-        fs.writeFileSync("testing.txt",encryptData.data);
-        res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+        try {
+          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+          fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
+          let encryptData = encryptMax(fileData, userKey);
+          fs.writeFileSync(userName+".txt", encryptData.data);
+          res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+        } catch (error) {
+          res.redirect(`http://127.0.0.3:8000/`);
+        }
+      });
+    });
+  }
+  else if(router.startsWith("/refresh"))
+  {
+    fs.readFile("passwords.html", "utf-8",(err, siteData)=>
+    {
+      if(err) throw err;
+      let slashpos;
+      slashpos = [];
+      for(let i = 0; i < router.length; i++)
+      {
+        if (router[i] === "/" && i != 0)
+        {
+          slashpos.push(i);
+        }
+      }
+      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let userKey = router.slice(slashpos[1]+1,slashpos[2]);
+      let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
+      console.log("r",userName);
+      console.log("r",userKey);
+      console.log("r",rollingKey);
+      let output = [];
+      fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
+      {
+        if(err) throw err;
+        try {
+          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+          let encryptData = encryptMax(fileData, userKey);
+          fs.writeFileSync(userName+".txt", encryptData.data);
+          res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+        }
+        catch (error)
+        {
+          res.redirect(`http://127.0.0.3:8000/`);
+        }
       });
     });
   }
@@ -99,7 +148,6 @@ function encryptMax(text, passkey)
 {
   let path = "";
   let encrypted = JSON.stringify(text);
-  console.log(encrypted);
   for (let i = 0; i < 10; i++)
   {
     let rand = Math.round(Math.random()*4);
