@@ -35,23 +35,32 @@ app.get(/[\s\S]*/, function(req, res) {
       let output = [];
       fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
       {
-        if(err) throw err;
-        try {
-          fileData = fileData.toString();
-          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
-          for (let I = 0; I < fileData.length; I++)
-          {
-            const dataTrio = fileData[I];
-            output.push(`<tr><td>${dataTrio.site}</td><td>${dataTrio.username}</td><td>${dataTrio.password}</td></tr>`);
-          }
-          if(fileData.length == 0)
-          {
-            output.push(`<tr><td>You Have no</td><td>Usernames</td><td>Or passwords</td></tr>`);
-          }
-          siteData = siteData.replace("^^_u_^^", output.join(''));
-          res.send(siteData);
-        } catch (error) {
+        if(err)
+        {
           res.redirect(`http://127.0.0.3:8000/`);
+        }
+        else
+        {
+          try
+          {
+            fileData = fileData.toString();
+            fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+            for (let I = 0; I < fileData.length; I++)
+            {
+              const dataTrio = fileData[I];
+              output.push(`<tr><td>${dataTrio.site}</td><td>${dataTrio.username}</td><td>${dataTrio.password}</td></tr>`);
+            }
+            if(fileData.length == 0)
+            {
+              output.push(`<tr><td>You Have no</td><td>Usernames</td><td>Or passwords</td></tr>`);
+            }
+            siteData = siteData.replace("^^_u_^^", output.join(''));
+            res.send(siteData);
+          }
+          catch (error)
+          {
+            res.redirect(`http://127.0.0.3:8000/`);
+          }
         }
       });
     });
@@ -85,15 +94,21 @@ app.get(/[\s\S]*/, function(req, res) {
       let output = [];
       fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
       {
-        if(err) throw err;
-        try {
-          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
-          fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
-          let encryptData = encryptMax(fileData, userKey);
-          fs.writeFileSync(userName+".txt", encryptData.data);
-          res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
-        } catch (error) {
+        if(err)
+        {
           res.redirect(`http://127.0.0.3:8000/`);
+        }
+        else
+        {
+          try {
+            fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+            fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
+            let encryptData = encryptMax(fileData, userKey);
+            fs.writeFileSync(userName+".txt", encryptData.data);
+            res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+          } catch (error) {
+            res.redirect(`http://127.0.0.3:8000/`);
+          }
         }
       });
     });
@@ -121,16 +136,23 @@ app.get(/[\s\S]*/, function(req, res) {
       let output = [];
       fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
       {
-        if(err) throw err;
-        try {
-          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
-          let encryptData = encryptMax(fileData, userKey);
-          fs.writeFileSync(userName+".txt", encryptData.data);
-          res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
-        }
-        catch (error)
+        if(err)
         {
           res.redirect(`http://127.0.0.3:8000/`);
+        }
+        else
+        {
+          try
+          {
+            fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+            let encryptData = encryptMax(fileData, userKey);
+            fs.writeFileSync(userName+".txt", encryptData.data);
+            res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+          }
+          catch(error)
+          {
+            res.redirect(`http://127.0.0.3:8000/`);
+          }
         }
       });
     });
