@@ -28,7 +28,7 @@ app.get(/[\s\S]*/, function(req, res) {
       }
       let userName = router.slice(slashpos[0]+1,slashpos[1]);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
-      let rollingKey = router.slice(slashpos[2]+1);
+      let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       console.log(userName);
       console.log(userKey);
       console.log(rollingKey);
@@ -37,14 +37,7 @@ app.get(/[\s\S]*/, function(req, res) {
       {
         if(err) throw err;
         fileData = fileData.toString();
-        if(rollingKey == "")
-        {
-          fileData = JSON.parse(decrypt(fileData, userKey));
-        }
-        else
-        {
-          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
-        }
+        fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
         for (let I = 0; I < fileData.length; I++)
         {
           const dataTrio = fileData[I];
@@ -85,26 +78,11 @@ app.get(/[\s\S]*/, function(req, res) {
       fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
       {
         if(err) throw err;
-        fileData = fileData.toString();
-        if(rollingKey == "")
-        {
-          fileData = JSON.parse(decrypt(fileData, userKey));
-        }
-        else
-        {
-          fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
-          tempIn = {"site":newSite,"username":newUsername,"password":newPassword};
-          let newFileData = fileData.push(tempIn);
-          newFileData = encryptMax(fileData,"logger");
-          fs.writeFileSync("testing.txt",newFileData.data);
-        }
-        for (let I = 0; I < fileData.length; I++)
-        {
-          const dataTrio = fileData[I];
-          output.push(`<tr><td>${dataTrio.site}</td><td>${dataTrio.username}</td><td>${dataTrio.password}</td></tr>`);
-        }
-        siteData = siteData.replace("^^_u_^^", output.join(''));
-        res.send(siteData);
+        fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+        fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
+        let encryptData = encryptMax(fileData,userKey);
+        fs.writeFileSync("testing.txt",encryptData.data);
+        res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
       });
     });
   }
@@ -120,12 +98,13 @@ app.get(/[\s\S]*/, function(req, res) {
 function encryptMax(text, passkey)
 {
   let path = "";
-  let encrypted = text;
+  let encrypted = JSON.stringify(text);
+  console.log(encrypted);
   for (let i = 0; i < 10; i++)
   {
     let rand = Math.round(Math.random()*4);
     path = path.concat(rand);
-    console.log(path);
+    //console.log(path,encrypted,passkey);
     if (rand == 0) {
       encrypted = String(CryptoJS.AES.encrypt(encrypted, passkey));
     }
@@ -206,13 +185,12 @@ fs.readFile("cknight167.txt",(err, fileData)=>
 /*
 fs.readFile("testing.txt",(err, fileData)=>
 {
-  fileData = fileData.toString();
   fileData = encryptMax(fileData,"logger");
   fs.writeFileSync("testing.txt",fileData.data);
   //console.log(fileData.path);
 });
 //*/
-
+/*
 fs.readFile("testing.txt",(err, fileData)=>
 {
   if(err) throw err
