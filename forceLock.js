@@ -254,11 +254,11 @@ fs.readFile("cknight167.txt",(err, fileData)=>
 
 //rolling key test (functional)
 /*
-fs.readFile("testing.txt",(err, fileData)=>
+fs.readFile("cf80cd8aed482d5d1527d7dc72fceff84e6326592848447d2dc0b0e87dfc9a90"+".txt",(err, fileData)=>
 {
   fileData = encryptMax(fileData,"logger");
   fs.writeFileSync("testing.txt",fileData.data);
-  //console.log(fileData.path);
+  console.log(fileData.path);
 });
 //*/
 /*
