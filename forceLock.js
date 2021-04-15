@@ -26,7 +26,7 @@ app.get(/[\s\S]*/, function(req, res) {
           slashpos.push(i);
         }
       }
-      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let userName = CryptoJS.SHA256(router.slice(slashpos[0]+1,slashpos[1])).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       console.log(userName);
@@ -79,7 +79,7 @@ app.get(/[\s\S]*/, function(req, res) {
           slashpos.push(i);
         }
       }
-      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let userName = CryptoJS.SHA256(router.slice(slashpos[0]+1,slashpos[1])).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       let newSite = router.slice(slashpos[3]+1,slashpos[4]);
@@ -127,7 +127,7 @@ app.get(/[\s\S]*/, function(req, res) {
           slashpos.push(i);
         }
       }
-      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let userName = CryptoJS.SHA256(router.slice(slashpos[0]+1,slashpos[1])).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       console.log("r",userName);
@@ -232,6 +232,7 @@ function encrypt(text, passkey)
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
+//max encrypt and decrypt
 /*
 fs.readFile("cknight167.txt",(err, fileData)=>
 {
@@ -241,15 +242,15 @@ fs.readFile("cknight167.txt",(err, fileData)=>
   fileData = String(encrypt(fileData,"logger"));
   fs.writeFileSync("cknight167.txt",fileData);
 });
-
+//*/
+/*
 fs.readFile("cknight167.txt",(err, fileData)=>
 {
   fileData = fileData.toString();
   fileData = decrypt(fileData,"logger");
   console.log(JSON.parse(fileData));
 });
-*/
-
+//*/
 
 //rolling key test (functional)
 /*
@@ -267,4 +268,11 @@ fs.readFile("testing.txt",(err, fileData)=>
   fileData = decryptMax(fileData, "logger", "0110432121");
   console.log(JSON.parse(fileData));
 });
+//*/
+
+//hashing a file name
+/*.toString(CryptoJS.enc.Hex);
+let oldname = "testing";
+let hashedName = CryptoJS.SHA256(oldname).toString(CryptoJS.enc.Hex);
+fs.renameSync(oldname+".txt", hashedName+".txt");
 //*/
