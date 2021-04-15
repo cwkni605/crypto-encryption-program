@@ -26,14 +26,15 @@ app.get(/[\s\S]*/, function(req, res) {
           slashpos.push(i);
         }
       }
-      let userName = CryptoJS.SHA256(router.slice(slashpos[0]+1,slashpos[1])).toString(CryptoJS.enc.Hex);
+      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       console.log(userName);
       console.log(userKey);
       console.log(rollingKey);
       let output = [];
-      fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
+      fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
         if(err)
         {
@@ -52,7 +53,7 @@ app.get(/[\s\S]*/, function(req, res) {
             }
             if(fileData.length == 0)
             {
-              output.push(`<tr><td>You Have no</td><td>Usernames</td><td>Or passwords</td></tr>`);
+              output.push(`<tr><td>You Have not added a...</td><td>Username</td><td>Or password</td></tr>`);
             }
             siteData = siteData.replace("^^_u_^^", output.join(''));
             res.send(siteData);
@@ -79,7 +80,8 @@ app.get(/[\s\S]*/, function(req, res) {
           slashpos.push(i);
         }
       }
-      let userName = CryptoJS.SHA256(router.slice(slashpos[0]+1,slashpos[1])).toString(CryptoJS.enc.Hex);
+      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       let newSite = router.slice(slashpos[3]+1,slashpos[4]);
@@ -92,7 +94,7 @@ app.get(/[\s\S]*/, function(req, res) {
       console.log(newUsername);
       console.log(newPassword);
       let output = [];
-      fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
+      fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
         if(err)
         {
@@ -103,10 +105,12 @@ app.get(/[\s\S]*/, function(req, res) {
           try {
             fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
             fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
+            //fileData = []; //resets the data
             let encryptData = encryptMax(fileData, userKey);
-            fs.writeFileSync(userName+".txt", encryptData.data);
+            fs.writeFileSync(hashedUserName+".txt", encryptData.data);
             res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
           } catch (error) {
+            console.log(error);
             res.redirect(`http://127.0.0.3:8000/`);
           }
         }
@@ -127,14 +131,15 @@ app.get(/[\s\S]*/, function(req, res) {
           slashpos.push(i);
         }
       }
-      let userName = CryptoJS.SHA256(router.slice(slashpos[0]+1,slashpos[1])).toString(CryptoJS.enc.Hex);
+      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       console.log("r",userName);
       console.log("r",userKey);
       console.log("r",rollingKey);
       let output = [];
-      fs.readFile(__dirname + "/" + userName + ".txt",(err, fileData)=>
+      fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
         if(err)
         {
@@ -146,11 +151,12 @@ app.get(/[\s\S]*/, function(req, res) {
           {
             fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
             let encryptData = encryptMax(fileData, userKey);
-            fs.writeFileSync(userName+".txt", encryptData.data);
+            fs.writeFileSync(hashedUserName+".txt", encryptData.data);
             res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
           }
           catch(error)
           {
+            console.log(error);
             res.redirect(`http://127.0.0.3:8000/`);
           }
         }
@@ -257,7 +263,7 @@ fs.readFile("cknight167.txt",(err, fileData)=>
 fs.readFile("cf80cd8aed482d5d1527d7dc72fceff84e6326592848447d2dc0b0e87dfc9a90"+".txt",(err, fileData)=>
 {
   fileData = encryptMax(fileData,"logger");
-  fs.writeFileSync("testing.txt",fileData.data);
+  fs.writeFileSync("cf80cd8aed482d5d1527d7dc72fceff84e6326592848447d2dc0b0e87dfc9a90.txt",fileData.data);
   console.log(fileData.path);
 });
 //*/

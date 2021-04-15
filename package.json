@@ -5,7 +5,7 @@
   "main": "forceLock.js",
   "scripts": {
     "test": "node forceLock.js",
-    "build": "nexe ",
+    "build": "nexe forceLock.js -r '*'",
     "debug": "jshint forceLock.js",
     "devStart":"nodemon forceLock.js"
   },
