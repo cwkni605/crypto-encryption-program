@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const CryptoJS = require('crypto-js');
 const { json } = require('express');
-const hostname = '127.0.0.3';
+const hostname = '127.0.0.5';
 const port = 8000;
 
 
@@ -38,7 +38,7 @@ app.get(/[\s\S]*/, function(req, res) {
       {
         if(err)
         {
-          res.redirect(`http://127.0.0.3:8000/`);
+          res.redirect(`http://${hostname}:8000/`);
         }
         else
         {
@@ -60,7 +60,7 @@ app.get(/[\s\S]*/, function(req, res) {
           }
           catch (error)
           {
-            res.redirect(`http://127.0.0.3:8000/`);
+            res.redirect(`http://${hostname}:8000/`);
           }
         }
       });
@@ -98,7 +98,7 @@ app.get(/[\s\S]*/, function(req, res) {
       {
         if(err)
         {
-          res.redirect(`http://127.0.0.3:8000/`);
+          res.redirect(`http://${hostname}:8000/`);
         }
         else
         {
@@ -108,10 +108,10 @@ app.get(/[\s\S]*/, function(req, res) {
             //fileData = []; //resets the data
             let encryptData = encryptMax(fileData, userKey);
             fs.writeFileSync(hashedUserName+".txt", encryptData.data);
-            res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+            res.redirect(`http://${hostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
           } catch (error) {
             console.log(error);
-            res.redirect(`http://127.0.0.3:8000/`);
+            res.redirect(`http://${hostname}:8000/`);
           }
         }
       });
@@ -143,7 +143,7 @@ app.get(/[\s\S]*/, function(req, res) {
       {
         if(err)
         {
-          res.redirect(`http://127.0.0.3:8000/`);
+          res.redirect(`http://${hostname}:8000/`);
         }
         else
         {
@@ -152,12 +152,12 @@ app.get(/[\s\S]*/, function(req, res) {
             fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
             let encryptData = encryptMax(fileData, userKey);
             fs.writeFileSync(hashedUserName+".txt", encryptData.data);
-            res.redirect(`http://127.0.0.3:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+            res.redirect(`http://${hostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
           }
           catch(error)
           {
             console.log(error);
-            res.redirect(`http://127.0.0.3:8000/`);
+            res.redirect(`http://${hostname}:8000/`);
           }
         }
       });
