@@ -1,5 +1,5 @@
 to
 
-1. add new password function
+1. 
 
 2. other
