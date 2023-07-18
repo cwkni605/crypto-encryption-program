@@ -5,19 +5,17 @@ const app = express();
 const CryptoJS = require('crypto-js');
 const { json } = require('express');
 const hostname = '127.0.0.5';
-const bighostname = '192.168.1.179';
+const bighostname = '192.168.1.202';//on dev computer'192.168.1.179';
 const port = 8000;
 
 
 app.get(/[\s\S]*/, function(req, res) {
   let router = req.url;
-  console.log("reciving request from " + router + "\n");
   if(router == "/favicon.ico"){
     res.sendFile(__dirname + "/" + "favicon.ico");
   }
   else if(router.startsWith("/newUser"))
   {
-    console.log("connects to proper route")
     fs.readFile("passwords.html", "utf-8",(err, siteData)=>
     {
       if(err) throw err;
@@ -36,38 +34,26 @@ app.get(/[\s\S]*/, function(req, res) {
       /* probaly will break the program because roll key does not exist
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
       //*/
-      console.log(userName);
-      console.log(userKey);
-      //console.log(rollingKey);
-      console.log("identified username and password");
       let output = [];
       fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, irrelevant)=>
       {
         if(err)
         {
-          console.log("failed successfully at username validity check");
           fs.writeFileSync(__dirname + "/" + hashedUserName + ".txt", "");
-          console.log("writing blank file");
           fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
           {
             if(err)
             {
-              console.log("failed to find new file");
               res.redirect(`http://${bighostname}:8000/`);
             }
             else
             {
-              console.log("found new file");
               try {
                 //fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
                 //fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
-                console.log("reseting data");
                 fileData = []; //resets the data
-                console.log("encrypting data");
                 let encryptData = encryptMax(fileData, userKey);
-                console.log("writing encrypted data to blank");
                 fs.writeFileSync(hashedUserName+".txt", encryptData.data);
-                console.log("finalizing with redirect to new account");
                 res.redirect(`http://${bighostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
               } catch (error) {
                 console.log(error);
@@ -78,7 +64,6 @@ app.get(/[\s\S]*/, function(req, res) {
         }
         else
         {
-          console.log("found a used username, kicking back to root");
           res.redirect(`http://${bighostname}:8000/`);
         }
       });
@@ -102,9 +87,6 @@ app.get(/[\s\S]*/, function(req, res) {
       let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
-      //console.log(userName);
-      //console.log(userKey);
-      //console.log(rollingKey);
       let output = [];
       fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
@@ -201,9 +183,6 @@ app.get(/[\s\S]*/, function(req, res) {
       let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
-      //console.log("r",userName);
-      //console.log("r",userKey);
-      //console.log("r",rollingKey);
       let output = [];
       fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
@@ -231,7 +210,7 @@ app.get(/[\s\S]*/, function(req, res) {
   }
   else
   {
-    console.log("any attempt at intrution or login attempt detected, sending root\nSource: " + router + "\n" + req.hostname + "\n" + req.url + "\n");
+    console.log("attempt at intrution, failed login attempt, or first join detected, sending root\nSource: " + router + "\n" + req.url + "\n");
     fs.readFile("login.html", "utf-8",(err, data)=>{
       if(err) throw err;
       res.send(data);
@@ -247,7 +226,6 @@ function encryptMax(text, passkey)
   {
     let rand = Math.round(Math.random()*4);
     path = path.concat(rand);
-    //console.log(path,encrypted,passkey);
     if (rand == 0) {
       encrypted = String(CryptoJS.AES.encrypt(encrypted, passkey));
     }
