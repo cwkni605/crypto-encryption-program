@@ -19,18 +19,10 @@
         </head>
         <body class="bg-dark">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <a class="navbar-brand" href="index.html">File Manager</a>
+                <a class="navbar-brand" href="/">ForceLock</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-    
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item active">
-                            <a class="nav-link" href="index.html">Control Center <span class="sr-only">(current)</span></a>
-                        </li>
-                    </ul>
-                </div>
             </nav>
             <div class="container">
                 <div class="row">
@@ -42,16 +34,17 @@
                                     <div class="card h-100">
                                         <div class="card-body">
                                             <h4 class="card-title">
-                                            <a href="">Passwords</a>
+                                            <a style="color: black;">Sign In or Sign Up Below</a>
                                             </h4>
                                             <p class="card-text">UserName</p>
                                             <input type="text" name="username" id="username" onkeyup="updateLink()">
                                             <p class="card-text">Passkey</p>
                                             <input type="text" name="passkey" id="passkey" onkeyup="updateLink()">
                                             <p class="card-text">Rolling Key</p>
-                                            <input type="text" name="rollkey" id="rollkey" onkeyup="updateLink()">
+                                            <input type="text" name="rollkey" id="rollkey" placeholder="leave blank if signing up" onkeyup="updateLink()">
                                             <br>
                                             <br>
+                                            <!-- Sign in -->
                                             <a id="loginButton" href="password/USERNAME/PASSKEY" class="list-group-item">Login</a>
                                             <script>
                                                 function updateLink() {
@@ -64,8 +57,16 @@
                                                     link = link + key + "/";
                                                     link = link + roll + "/";
                                                     document.getElementById("loginButton").href = link;
+                                                    //sign up link change
+                                                    let link2 = document.getElementById("signUpButton").href;
+                                                    link2 = "newUser/";
+                                                    link2 = link2 + name + "/";
+                                                    link2 = link2 + key + "/";
+                                                    document.getElementById("signUpButton").href = link2;
                                                 }
                                             </script>
+                                            <!-- Sign up -->
+                                            <a id="signUpButton" href="newUser/USERNAME/PASSKEY" class="list-group-item">Sign Up</a>
                                         </div>
                                     </div>
                                 </div>
