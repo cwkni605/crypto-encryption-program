@@ -7,14 +7,86 @@ const { json } = require('express');
 const nodemailer = require('nodemailer');// needs install
 const {google} = require('googleapis');  // needs install
 const hostname = '127.0.0.5';
+const bighostname = '192.168.1.179';
 const port = 8000;
 
 
 app.get(/[\s\S]*/, function(req, res) {
   let router = req.url;
-  if(router == "/favicon.ico") router = "/";
-
-  if(router.startsWith("/password"))
+  console.log("reciving request from " + router + "\n");
+  if(router == "/favicon.ico"){
+    res.sendFile(__dirname + "/" + "favicon.ico");
+  }
+  else if(router.startsWith("/newUser"))
+  {
+    console.log("connects to proper route")
+    fs.readFile("passwords.html", "utf-8",(err, siteData)=>
+    {
+      if(err) throw err;
+      let slashpos;
+      slashpos = [];
+      for(let i = 0; i < router.length; i++)
+      {
+        if (router[i] === "/" && i != 0)
+        {
+          slashpos.push(i);
+        }
+      }
+      let userName = router.slice(slashpos[0]+1,slashpos[1]);
+      let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
+      let userKey = router.slice(slashpos[1]+1,slashpos[2]);
+      /* probaly will break the program because roll key does not exist
+      let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
+      //*/
+      console.log(userName);
+      console.log(userKey);
+      //console.log(rollingKey);
+      console.log("identified username and password");
+      let output = [];
+      fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, irrelevant)=>
+      {
+        if(err)
+        {
+          console.log("failed successfully at username validity check");
+          fs.writeFileSync(__dirname + "/" + hashedUserName + ".txt", "");
+          console.log("writing blank file");
+          fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
+          {
+            if(err)
+            {
+              console.log("failed to find new file");
+              res.redirect(`http://${bighostname}:8000/`);
+            }
+            else
+            {
+              console.log("found new file");
+              try {
+                //fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
+                //fileData.push({"site":newSite,"username":newUsername,"password":newPassword});
+                console.log("reseting data");
+                fileData = []; //resets the data
+                console.log("encrypting data");
+                let encryptData = encryptMax(fileData, userKey);
+                console.log("writing encrypted data to blank");
+                fs.writeFileSync(hashedUserName+".txt", encryptData.data);
+                console.log("finalizing with redirect to new account");
+                res.redirect(`http://${bighostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+              } catch (error) {
+                console.log(error);
+                res.redirect(`http://${bighostname}:8000/`);
+              }
+            }
+          });
+        }
+        else
+        {
+          console.log("found a used username, kicking back to root");
+          res.redirect(`http://${bighostname}:8000/`);
+        }
+      });
+    });
+  }
+  else if(router.startsWith("/password"))
   {
     fs.readFile("passwords.html", "utf-8",(err, siteData)=>
     {
@@ -32,15 +104,15 @@ app.get(/[\s\S]*/, function(req, res) {
       let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
-      console.log(userName);
-      console.log(userKey);
-      console.log(rollingKey);
+      //console.log(userName);
+      //console.log(userKey);
+      //console.log(rollingKey);
       let output = [];
       fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
         if(err)
         {
-          res.redirect(`http://${hostname}:8000/`);
+          res.redirect(`http://${bighostname}:8000/`);
         }
         else
         {
@@ -62,7 +134,7 @@ app.get(/[\s\S]*/, function(req, res) {
           }
           catch (error)
           {
-            res.redirect(`http://${hostname}:8000/`);
+            res.redirect(`http://${bighostname}:8000/`);
           }
         }
       });
@@ -86,21 +158,15 @@ app.get(/[\s\S]*/, function(req, res) {
       let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
-      let newSite = router.slice(slashpos[3]+1,slashpos[4]);
-      let newUsername = router.slice(slashpos[4]+1,slashpos[5]);
-      let newPassword = router.slice(slashpos[5]+1,slashpos[6]);
-      console.log(userName);
-      console.log(userKey);
-      console.log(rollingKey);
-      console.log(newSite);
-      console.log(newUsername);
-      console.log(newPassword);
+      let newSite = router.slice(slashpos[3]+1,slashpos[4]).replace(/(%20)/g, " ");
+      let newUsername = router.slice(slashpos[4]+1,slashpos[5]).replace(/(%20)/g, " ");
+      let newPassword = router.slice(slashpos[5]+1,slashpos[6]).replace(/(%20)/g, " ");
       let output = [];
       fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
         if(err)
         {
-          res.redirect(`http://${hostname}:8000/`);
+          res.redirect(`http://${bighostname}:8000/`);
         }
         else
         {
@@ -110,10 +176,10 @@ app.get(/[\s\S]*/, function(req, res) {
             //fileData = []; //resets the data
             let encryptData = encryptMax(fileData, userKey);
             fs.writeFileSync(hashedUserName+".txt", encryptData.data);
-            res.redirect(`http://${hostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+            res.redirect(`http://${bighostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
           } catch (error) {
             console.log(error);
-            res.redirect(`http://${hostname}:8000/`);
+            res.redirect(`http://${bighostname}:8000/`);
           }
         }
       });
@@ -137,15 +203,15 @@ app.get(/[\s\S]*/, function(req, res) {
       let hashedUserName = CryptoJS.SHA256(userName).toString(CryptoJS.enc.Hex);
       let userKey = router.slice(slashpos[1]+1,slashpos[2]);
       let rollingKey = router.slice(slashpos[2]+1,slashpos[3]);
-      console.log("r",userName);
-      console.log("r",userKey);
-      console.log("r",rollingKey);
+      //console.log("r",userName);
+      //console.log("r",userKey);
+      //console.log("r",rollingKey);
       let output = [];
       fs.readFile(__dirname + "/" + hashedUserName + ".txt",(err, fileData)=>
       {
         if(err)
         {
-          res.redirect(`http://${hostname}:8000/`);
+          res.redirect(`http://${bighostname}:8000/`);
         }
         else
         {
@@ -154,12 +220,12 @@ app.get(/[\s\S]*/, function(req, res) {
             fileData = JSON.parse(decryptMax(fileData, userKey, rollingKey));
             let encryptData = encryptMax(fileData, userKey);
             fs.writeFileSync(hashedUserName+".txt", encryptData.data);
-            res.redirect(`http://${hostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
+            res.redirect(`http://${bighostname}:8000/password/${userName}/${userKey}/${encryptData.path}/`);
           }
           catch(error)
           {
             console.log(error);
-            res.redirect(`http://${hostname}:8000/`);
+            res.redirect(`http://${bighostname}:8000/`);
           }
         }
       });
@@ -167,6 +233,7 @@ app.get(/[\s\S]*/, function(req, res) {
   }
   else
   {
+    console.log("any attempt at intrution or login attempt detected, sending root\nSource: " + router + "\n" + req.hostname + "\n" + req.url + "\n");
     fs.readFile("login.html", "utf-8",(err, data)=>{
       if(err) throw err;
       res.send(data);
@@ -237,9 +304,14 @@ function encrypt(text, passkey)
 {
   return encrypted = CryptoJS.AES.encrypt(text, passkey);
 }
+/*
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
+//*/
+app.listen(port, bighostname, () => {
+  console.log(`Server running at http://${bighostname}:${port}/`);
+})
 
 //max encrypt and decrypt
 /*
