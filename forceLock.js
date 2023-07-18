@@ -4,8 +4,8 @@ const express = require('express');
 const app = express();
 const CryptoJS = require('crypto-js');
 const { json } = require('express');
-const nodemailer = require('nodemailer');// needs install
-const {google} = require('googleapis');  // needs install
+//const nodemailer = require('nodemailer');// needs install
+//const {google} = require('googleapis');  // needs install
 const hostname = '127.0.0.5';
 const bighostname = '192.168.1.179';
 const port = 8000;
@@ -358,7 +358,7 @@ let hashedName = CryptoJS.SHA256(oldname).toString(CryptoJS.enc.Hex);
 fs.renameSync(oldname+".txt", hashedName+".txt");
 //*/
 
-
+/*
 //define client information from google developer console
 const CLIENT_ID = '239833299288-attcbt6cg8iu8n8fvvkt2u77i8d54kd2.apps.googleusercontent.com';
 const CLIENT_SECRET = 'FGpJigJM0ORp-G3JewO-AdXL';
@@ -403,3 +403,4 @@ async function sendMail(from, to, title, body, attachments="") {
     }
 }
 //sendMail("Connor Knight Test","mcrowell206@west-mec.org","this is a test", "this is a test for my two step oAuth for my password manager.").then(result => console.log("Email sent...", result)).catch((error)=> console.log(error.message));
+//*/
