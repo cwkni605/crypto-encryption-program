@@ -4,8 +4,6 @@ const express = require('express');
 const app = express();
 const CryptoJS = require('crypto-js');
 const { json } = require('express');
-//const nodemailer = require('nodemailer');// needs install
-//const {google} = require('googleapis');  // needs install
 const hostname = '127.0.0.5';
 const bighostname = '192.168.1.179';
 const port = 8000;
@@ -356,51 +354,4 @@ fs.readFile("testing.txt",(err, fileData)=>
 let oldname = "testing";
 let hashedName = CryptoJS.SHA256(oldname).toString(CryptoJS.enc.Hex);
 fs.renameSync(oldname+".txt", hashedName+".txt");
-//*/
-
-/*
-//define client information from google developer console
-const CLIENT_ID = '239833299288-attcbt6cg8iu8n8fvvkt2u77i8d54kd2.apps.googleusercontent.com';
-const CLIENT_SECRET = 'FGpJigJM0ORp-G3JewO-AdXL';
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground/';
-const REFRESH_TOKEN = '1//04JsW_0UQn8nfCgYIARAAGAQSNwF-L9IrDc20phbP_leTiZUWt4Ejt-jAET5HlDcbxdP5IXmVOSQNx-gOT4UthbWzbwZWkag5Smc';
-
-//using the google object create and populate authentication creds
-const oAuth2client = new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET,REDIRECT_URI);
-oAuth2client.setCredentials({refresh_token: REFRESH_TOKEN});
-
-//send email function
-async function sendMail(from, to, title, body, attachments="") {
-    try {
-      const accessToken = await oAuth2client.getAccessToken();
-      const transport = nodemailer.createTransport({
-          service:'gmail',
-          auth:{
-            type:'oAuth2',
-            user:'cknight167@west-mec.org',
-            clientId: CLIENT_ID,
-            clientSecret: CLIENT_SECRET,
-            refreshToken: REFRESH_TOKEN,
-            accessToken: accessToken
-          }
-        });
-      const eMail = {
-        from: `${from}<cknight167@west-mec.org>`,
-        to: to,
-        subject: title,
-        text: body,
-        html: body
-      }
-      if(attachments != "")
-      {
-        eMail.attachments=[{path: "resources/"+attachments}];
-      }
-      const result = await transport.sendMail(eMail);
-      return result;
-    }
-    catch (error) {
-      return error;
-    }
-}
-//sendMail("Connor Knight Test","mcrowell206@west-mec.org","this is a test", "this is a test for my two step oAuth for my password manager.").then(result => console.log("Email sent...", result)).catch((error)=> console.log(error.message));
 //*/
